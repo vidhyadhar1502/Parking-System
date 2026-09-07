@@ -385,12 +385,68 @@ Runs:
 
 ---
 
-## 11. Upcoming Development Roadmap
+## 11. Phase 4 — JavaFX Authentication UI (Completed)
 
-- **Phase 4 — JavaFX Authentication UI**:
-  - `Login.fxml` and `Register.fxml` views following modern Geometric Balance styling.
-  - `LoginController` and `RegisterController` integrating `AuthService`.
-  - Role-based dashboard navigation (Customer dashboard vs. Admin dashboard).
+Phase 4 connects the existing service and persistence foundation to the JavaFX desktop user interface, implementing login, registration, deterministic navigation, session-aware route protection, and role-based dashboard landing views.
+
+### 11.1 Presentation & Controller Architecture
+
+```
+FXML Views (/fxml/)          JavaFX Controllers (/controller/)            Business Layer (/service/)
+┌────────────────────────┐   ┌───────────────────────────────┐           ┌────────────────────────┐
+│ Login.fxml             │──>│ LoginController               │──────────>│ AuthService            │
+├────────────────────────┤   ├───────────────────────────────┤           ├────────────────────────┤
+│ Register.fxml          │──>│ RegisterController            │──────────>│ ServiceRegistry        │
+├────────────────────────┤   ├───────────────────────────────┤           ├────────────────────────┤
+│ CustomerDashboard.fxml │──>│ CustomerDashboardController   │──────────>│ AppSession             │
+├────────────────────────┤   ├───────────────────────────────┤           └────────────────────────┘
+│ AdminDashboard.fxml    │──>│ AdminDashboardController      │
+└────────────────────────┘   └───────────────────────────────┘
+                                             │
+                                             ▼
+                             ┌───────────────────────────────┐
+                             │ NavigationUtil                │
+                             │ (Scene switching, RBAC gates) │
+                             └───────────────────────────────┘
+```
+
+### 11.2 Core Components & Responsibilities
+
+| Component | Type | Location | Responsibilities |
+| :--- | :--- | :--- | :--- |
+| `Login.fxml` | FXML View | `/fxml/Login.fxml` | Polished login form with email, password, default button binding, progress indicator, and validation feedback label. |
+| `LoginController` | Controller | `com.smartparking.controller` | Asynchronous authentication dispatch on background thread; handles `ValidationException`, `AuthenticationException`, and `ServiceException`; redirects to role dashboard. |
+| `Register.fxml` | FXML View | `/fxml/Register.fxml` | Driver registration form with name, email, phone, vehicle number, password, and confirm password fields. |
+| `RegisterController` | Controller | `com.smartparking.controller` | UI-level confirm-password match validation (confirm-password is never sent to backend); invokes `AuthService.register`; redirects to login on success. |
+| `NavigationUtil` | Utility | `com.smartparking.util` | Thread-safe scene switching reusing primary Stage; atomic route protection; unauthenticated access rejection; role mismatch handling; pending message queues. |
+| `NavigationException` | Exception | `com.smartparking.util` | Specialized runtime exception for FXML loading and view resolution failures. |
+| `ServiceRegistry` | Service Registry | `com.smartparking.service` | Central provider for shared service instances (`AuthService`, `UserService`); supports dependency injection in controllers and unit testing. |
+| `CustomerDashboard.fxml` | FXML View | `/fxml/CustomerDashboard.fxml` | Driver portal displaying active session, registered vehicle, quick contact, and Phase 5/6 feature preview cards. |
+| `CustomerDashboardController` | Controller | `com.smartparking.controller` | Guards customer session; populates driver profile; redirects unauthorized admins to Admin Portal; handles logout. |
+| `AdminDashboard.fxml` | FXML View | `/fxml/AdminDashboard.fxml` | Administrative supervisor portal with facility operations overview and upcoming Phase 5-8 module preview cards. |
+| `AdminDashboardController` | Controller | `com.smartparking.controller` | Enforces `Role.ADMIN` security verification; rejects customer intrusion; displays supervisor session details; handles logout. |
+
+### 11.3 Navigation & Security Verification Rules
+
+1. **Strict MVC Separation**: Controllers delegate all authentication logic, hashing, and database access to `AuthService` and `ServiceRegistry`. Zero direct SQL or JDBC in controllers.
+2. **Deterministic Failure Handling**:
+   - Navigation failures never produce blank windows, frozen UIs, or raw stack traces.
+   - Missing or corrupted FXML logs technical diagnostics and keeps the current UI stable with user-friendly error banners.
+3. **Session-Aware Route Guarding**:
+   - Both `NavigationUtil` and dashboard controllers independently verify `AppSession.isLoggedIn()`.
+   - Direct access to `CustomerDashboard` or `AdminDashboard` while unauthenticated triggers immediate redirect to `Login.fxml`.
+4. **Role-Based Routing**:
+   - `Role.CUSTOMER` is routed exclusively to the Customer Dashboard.
+   - `Role.ADMIN` is routed exclusively to the Admin Dashboard.
+   - Customers attempting unauthorized access to the Admin Dashboard are denied and returned to the Customer Dashboard with an explicit access rejection banner.
+   - Users with invalid or null roles have their session invalidated immediately and are redirected to `Login.fxml`.
+5. **Logout Lifecycle**:
+   - `AppSession.logout()` is called prior to scene transition, ensuring the security context is completely cleared even if UI rendering experiences an interruption.
+
+---
+
+## 12. Upcoming Development Roadmap
+
 - **Phase 5 — Slot Management & Real-Time Booking**:
   - `ReservationService` with atomic multi-step booking transactions (`FOR UPDATE`).
   - Floor-level visual bay selector with live occupancy color-coding.

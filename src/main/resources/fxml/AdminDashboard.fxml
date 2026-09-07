@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="720.0" prefWidth="1100.0" 
+            stylesheets="@../css/style.css" 
+            xmlns="http://javafx.com/javafx/21" 
+            xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.smartparking.controller.AdminDashboardController">
+
+    <!-- Top Navigation Bar -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="16.0" style="-fx-background-color: #0F172A; -fx-padding: 16px 32px;">
+            <VBox spacing="2.0">
+                <Label style="-fx-font-weight: 900; -fx-font-size: 15px; -fx-letter-spacing: 1px;" text="SMART PARKING • ADMIN OPERATIONS PORTAL" textFill="#FFFFFF" />
+                <Label style="-fx-font-size: 11px;" text="Campus Facilities, Tariffs, Slot Control &amp; Revenue Analytics" textFill="#94A3B8" />
+            </VBox>
+            <Region HBox.hgrow="ALWAYS" />
+            
+            <HBox alignment="CENTER" spacing="12.0">
+                <VBox alignment="CENTER_RIGHT" spacing="2.0">
+                    <Label fx:id="lblAdminNameTop" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #FFFFFF;" text="Administrator" />
+                    <Label fx:id="lblAdminEmailTop" style="-fx-font-size: 11px; -fx-text-fill: #94A3B8;" text="admin@campus.edu" />
+                </VBox>
+                <Label styleClass="badge-role-admin" text="ADMIN PRIVILEGES" />
+                <Button fx:id="btnLogoutTop" onAction="#handleLogout" styleClass="btn-danger" text="Log Out" />
+            </HBox>
+        </HBox>
+    </top>
+
+    <!-- Center Content Body -->
+    <center>
+        <VBox spacing="20.0" style="-fx-padding: 32px 40px; -fx-background-color: #F8FAFC;">
+            <!-- Welcome Header Card -->
+            <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="card">
+                <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                    <HBox alignment="CENTER_LEFT" spacing="8.0">
+                        <Label fx:id="lblWelcome" styleClass="heading-title" text="Campus Facility Operations" />
+                        <Label styleClass="badge-role-admin" text="AUTHORIZED SUPERVISOR" />
+                    </HBox>
+                    <Label styleClass="subheading" text="Configure parking decks, manage slot statuses, review active bookings, and audit revenue." />
+                </VBox>
+
+                <!-- Admin Status Quick Summary -->
+                <HBox spacing="16.0" style="-fx-background-color: #EDE9FE; -fx-padding: 12px 20px; -fx-background-radius: 10px; -fx-border-color: #DDD6FE; -fx-border-radius: 10px;">
+                    <VBox spacing="2.0">
+                        <Label style="-fx-font-size: 11px; -fx-text-fill: #6D28D9; -fx-font-weight: bold;" text="ACCESS LEVEL" />
+                        <Label style="-fx-font-size: 14px; -fx-font-weight: 800; -fx-text-fill: #4C1D95;" text="Full Super-Admin" />
+                    </VBox>
+                    <VBox spacing="2.0">
+                        <Label style="-fx-font-size: 11px; -fx-text-fill: #6D28D9; -fx-font-weight: bold;" text="SECURITY CONTEXT" />
+                        <Label style="-fx-font-size: 14px; -fx-font-weight: 800; -fx-text-fill: #4C1D95;" text="Role.ADMIN" />
+                    </VBox>
+                </HBox>
+            </HBox>
+
+            <!-- Admin Modules Grid (Placeholders for upcoming phases) -->
+            <GridPane hgap="20.0" vgap="16.0">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="33.3" />
+                    <ColumnConstraints percentWidth="33.3" />
+                    <ColumnConstraints percentWidth="33.4" />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints percentHeight="50.0" />
+                    <RowConstraints percentHeight="50.0" />
+                </rowConstraints>
+
+                <!-- Module 1: Facility Locations -->
+                <VBox spacing="8.0" styleClass="card-compact" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <HBox alignment="CENTER_LEFT" spacing="6.0">
+                        <Label styleClass="heading-subtitle" text="1. Parking Locations" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label styleClass="badge-placeholder" text="PHASE 5" />
+                    </HBox>
+                    <Label styleClass="subheading" text="Add and manage campus parking decks, GPS coordinates, and hourly rates." wrapText="true" />
+                    <Region VBox.vgrow="ALWAYS" />
+                    <Button disable="true" maxWidth="1.7976931348623157E308" styleClass="btn-secondary" text="Manage Locations (Soon)" />
+                </VBox>
+
+                <!-- Module 2: Bay / Slot Control -->
+                <VBox spacing="8.0" styleClass="card-compact" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                    <HBox alignment="CENTER_LEFT" spacing="6.0">
+                        <Label styleClass="heading-subtitle" text="2. Parking Slots" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label styleClass="badge-placeholder" text="PHASE 5" />
+                    </HBox>
+                    <Label styleClass="subheading" text="Add parking bays, manage types (EV, Accessible, Compact) and override slot status." wrapText="true" />
+                    <Region VBox.vgrow="ALWAYS" />
+                    <Button disable="true" maxWidth="1.7976931348623157E308" styleClass="btn-secondary" text="Manage Slots (Soon)" />
+                </VBox>
+
+                <!-- Module 3: User Directory -->
+                <VBox spacing="8.0" styleClass="card-compact" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                    <HBox alignment="CENTER_LEFT" spacing="6.0">
+                        <Label styleClass="heading-subtitle" text="3. Registered Users" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label styleClass="badge-placeholder" text="PHASE 6" />
+                    </HBox>
+                    <Label styleClass="subheading" text="Inspect driver records, registered vehicles, contact numbers, and account history." wrapText="true" />
+                    <Region VBox.vgrow="ALWAYS" />
+                    <Button disable="true" maxWidth="1.7976931348623157E308" styleClass="btn-secondary" text="View Users (Soon)" />
+                </VBox>
+
+                <!-- Module 4: Active Reservations -->
+                <VBox spacing="8.0" styleClass="card-compact" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                    <HBox alignment="CENTER_LEFT" spacing="6.0">
+                        <Label styleClass="heading-subtitle" text="4. Reservations Desk" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label styleClass="badge-placeholder" text="PHASE 6" />
+                    </HBox>
+                    <Label styleClass="subheading" text="Monitor upcoming, active, and completed driver bookings with manual check-in override." wrapText="true" />
+                    <Region VBox.vgrow="ALWAYS" />
+                    <Button disable="true" maxWidth="1.7976931348623157E308" styleClass="btn-secondary" text="View Bookings (Soon)" />
+                </VBox>
+
+                <!-- Module 5: Occupancy Monitoring -->
+                <VBox spacing="8.0" styleClass="card-compact" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <HBox alignment="CENTER_LEFT" spacing="6.0">
+                        <Label styleClass="heading-subtitle" text="5. Gate &amp; Occupancy" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label styleClass="badge-placeholder" text="PHASE 7" />
+                    </HBox>
+                    <Label styleClass="subheading" text="Real-time capacity utilization gauges, automated barrier control, and QR entry simulator." wrapText="true" />
+                    <Region VBox.vgrow="ALWAYS" />
+                    <Button disable="true" maxWidth="1.7976931348623157E308" styleClass="btn-secondary" text="Gate Monitor (Soon)" />
+                </VBox>
+
+                <!-- Module 6: Revenue Analytics -->
+                <VBox spacing="8.0" styleClass="card-compact" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                    <HBox alignment="CENTER_LEFT" spacing="6.0">
+                        <Label styleClass="heading-subtitle" text="6. Tariffs &amp; Revenue" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label styleClass="badge-placeholder" text="PHASE 8" />
+                    </HBox>
+                    <Label styleClass="subheading" text="Duration tariff settlements, payment audits, daily revenue reports, and CSV exports." wrapText="true" />
+                    <Region VBox.vgrow="ALWAYS" />
+                    <Button disable="true" maxWidth="1.7976931348623157E308" styleClass="btn-secondary" text="Audit Revenue (Soon)" />
+                </VBox>
+            </GridPane>
+        </VBox>
+    </center>
+
+    <!-- Bottom Status Bar -->
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="12.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #E2E8F0; -fx-border-width: 1px 0 0 0; -fx-padding: 10px 32px;">
+            <Label style="-fx-font-size: 11px; -fx-text-fill: #64748B;" text="Administrator Session: " />
+            <Label fx:id="lblSessionStatus" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #4C1D95;" text="Admin Verified" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button onAction="#handleLogout" styleClass="btn-link" text="Sign out of admin portal" />
+        </HBox>
+    </bottom>
+</BorderPane>

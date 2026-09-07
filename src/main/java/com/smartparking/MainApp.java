@@ -30,14 +30,14 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            logger.info("Starting JavaFX Stage...");
-            URL fxmlUrl = getClass().getResource("/fxml/main.fxml");
+            logger.info("Starting JavaFX Stage with Login View...");
+            URL fxmlUrl = getClass().getResource("/fxml/Login.fxml");
             
             Parent root;
             if (fxmlUrl != null) {
                 root = FXMLLoader.load(fxmlUrl);
             } else {
-                logger.warn("main.fxml not found on classpath, launching fallback container.");
+                logger.warn("Login.fxml not found on classpath, launching fallback container.");
                 javafx.scene.layout.StackPane fallback = new javafx.scene.layout.StackPane();
                 javafx.scene.control.Label lbl = new javafx.scene.control.Label(
                         "Smart Parking Management System - JavaFX Core Initialized"

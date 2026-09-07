@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="720.0" prefWidth="1100.0" 
+            stylesheets="@../css/style.css" 
+            xmlns="http://javafx.com/javafx/21" 
+            xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.smartparking.controller.RegisterController">
+
+    <!-- Top Navigation Bar -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="16.0" style="-fx-background-color: #0F172A; -fx-padding: 16px 32px;">
+            <VBox spacing="2.0">
+                <Label style="-fx-font-weight: 900; -fx-font-size: 15px; -fx-letter-spacing: 1px;" text="SMART PARKING MANAGEMENT SYSTEM" textFill="#FFFFFF" />
+                <Label style="-fx-font-size: 11px;" text="New Driver &amp; Customer Account Registration" textFill="#94A3B8" />
+            </VBox>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnBackToLoginTop" onAction="#handleBackToLogin" styleClass="btn-secondary" text="Back to Login" />
+        </HBox>
+    </top>
+
+    <!-- Center Registration Card -->
+    <center>
+        <VBox alignment="CENTER" spacing="16.0" style="-fx-padding: 24px;">
+            <VBox maxWidth="520.0" spacing="16.0" styleClass="card">
+                <!-- Header -->
+                <VBox alignment="CENTER" spacing="4.0">
+                    <Label styleClass="heading-title" text="Create Your Account" />
+                    <Label styleClass="subheading" text="Join the campus smart parking network to reserve parking bays" />
+                </VBox>
+
+                <!-- Feedback / Status Message -->
+                <Label fx:id="lblMessage" alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="message-error" text="" textAlignment="CENTER" visible="false" />
+
+                <!-- Form Fields -->
+                <VBox spacing="12.0">
+                    <!-- Full Name -->
+                    <VBox spacing="4.0">
+                        <Label styleClass="form-label" text="Full Name *" />
+                        <TextField fx:id="txtFullName" promptText="e.g. Arun Kumar" />
+                    </VBox>
+
+                    <!-- Email & Phone in 2 Columns -->
+                    <HBox spacing="12.0">
+                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="form-label" text="Email Address *" />
+                            <TextField fx:id="txtEmail" promptText="e.g. arun@campus.edu" />
+                        </VBox>
+                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="form-label" text="Phone Number *" />
+                            <TextField fx:id="txtPhoneNumber" promptText="e.g. +91 9876543210" />
+                        </VBox>
+                    </HBox>
+
+                    <!-- Vehicle Number (Optional) -->
+                    <VBox spacing="4.0">
+                        <HBox alignment="CENTER_LEFT" spacing="6.0">
+                            <Label styleClass="form-label" text="Vehicle Registration Number" />
+                            <Label style="-fx-font-size: 11px; -fx-text-fill: #94A3B8;" text="(Optional - e.g. TN 09 BX 4512)" />
+                        </HBox>
+                        <TextField fx:id="txtVehicleNumber" promptText="Enter your primary license plate" />
+                    </VBox>
+
+                    <!-- Password & Confirm Password in 2 Columns -->
+                    <HBox spacing="12.0">
+                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="form-label" text="Password (min 8 chars) *" />
+                            <PasswordField fx:id="txtPassword" promptText="Create password" />
+                        </VBox>
+                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="form-label" text="Confirm Password *" />
+                            <PasswordField fx:id="txtConfirmPassword" promptText="Re-enter password" />
+                        </VBox>
+                    </HBox>
+                </VBox>
+
+                <!-- Actions -->
+                <VBox spacing="10.0" style="-fx-padding: 8px 0 0 0;">
+                    <StackPane>
+                        <Button fx:id="btnRegister" defaultButton="true" maxWidth="1.7976931348623157E308" onAction="#handleRegister" styleClass="btn-primary" text="REGISTER ACCOUNT" />
+                        <ProgressIndicator fx:id="progressIndicator" maxHeight="24.0" maxWidth="24.0" visible="false" />
+                    </StackPane>
+
+                    <HBox alignment="CENTER" spacing="4.0">
+                        <Label styleClass="subheading" text="Already have an account?" />
+                        <Button fx:id="btnBackToLogin" onAction="#handleBackToLogin" styleClass="btn-link" text="Log In here" />
+                    </HBox>
+                </VBox>
+            </VBox>
+        </VBox>
+    </center>
+
+    <!-- Footer -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-background-color: #FFFFFF; -fx-border-color: #E2E8F0; -fx-border-width: 1px 0 0 0; -fx-padding: 12px 24px;">
+            <Label style="-fx-font-size: 11px; -fx-text-fill: #94A3B8;" text="Public registrations receive Customer access. Administrative roles require campus supervisor provisioning." />
+        </HBox>
+    </bottom>
+</BorderPane>
