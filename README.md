@@ -244,6 +244,19 @@ The compiled JAR will be output to `target/smart-parking-system-1.0.0-SNAPSHOT.j
 - [x] **Safe Conversions & Precision**: `JdbcUtils` with null-safe Enum parsing, `java.time.LocalDateTime` to `java.sql.Timestamp` mapping, and `BigDecimal` precision for all financial columns.
 - [x] **Offline Unit Test Suite**: `JdbcUtilsTest` and `DaoStructureTest` verifying contracts, enum mapping, and reflection signatures.
 
+### Phase 3 — Authentication & User Security Service (Complete)
+- [x] **Service Exception Hierarchy**: Unchecked base `ServiceException`, `ValidationException`, and `AuthenticationException` decoupling presentation/controller layers from lower-level database details.
+- [x] **Authentication Service (`AuthService.java`)**:
+  - Full input validation & normalization (Unicode-compliant names, standard email formatting with lowercase normalization, international phone numbers with optional `+`, raw un-trimmed passwords between 8-72 characters, and vehicle formatting).
+  - Duplicate email prevention prior to database insertion.
+  - Enforced `Role.CUSTOMER` for public self-registration.
+  - Salted BCrypt password hashing (`BCrypt.hashpw`, `BCrypt.gensalt()`) and verification (`BCrypt.checkpw`).
+  - Thread-safe `AppSession` integration on login, logout, and role inspection.
+  - Generic authentication failure exceptions that resist user enumeration.
+  - Pure business logic completely decoupled from JavaFX dependencies.
+- [x] **User Management Service (`UserService.java`)**: Dedicated service for non-authentication user operations (profile updates, vehicle updates, session synchronization, and administrative user directories).
+- [x] **Comprehensive JUnit 5 Unit Tests (`AuthServiceTest.java`)**: 14 tests covering valid and edge-case registrations, validation boundaries, password hashing, session synchronization, and login flows via an in-memory `FakeUserDao`.
+
 ---
 
 ## 9. Phase 2 — DAO Layer Architecture & Documentation
@@ -314,22 +327,79 @@ Multi-step business transactions (e.g. locking a slot, verifying status, creatin
 
 ---
 
-## 10. Upcoming Development Roadmap
+## 10. Phase 3 — Authentication & User Security Architecture & Documentation
 
-- **Phase 3 — Authentication & User Security**:
-  - `AuthService` with BCrypt password hashing & validation.
-  - User registration validation and duplicate email checks.
-  - Login & Registration JavaFX screens (`Login.fxml`, `Register.fxml`, controllers).
-  - Role-based navigation routing (Customer vs. Admin) via `AppSession`.
-- **Phase 4 — Slot Management & Real-Time Booking**:
+### 10.1 Service Layer Architecture
+
+The service tier contains business validation rules, security policies, and session state orchestration, completely decoupled from JavaFX UI views:
+
+```
+Presentation / Controllers (LoginController, RegisterController)
+                         │
+                         ▼
+        Service Layer (AuthService, UserService)
+        - Strict Data Validation & Normalization
+        - BCrypt 0.4 Password Hashing ($2a$ salt)
+        - Session Population (AppSession)
+                         │
+                         ▼
+             DAO Layer (UserDao, etc.)
+                         │
+                         ▼
+                 MySQL 8.x Database
+```
+
+### 10.2 Services and Exception Handling
+
+| Class | Type | Package | Primary Responsibilities |
+| :--- | :--- | :--- | :--- |
+| `AuthService` | Service | `com.smartparking.service` | `register(...)`, `login(...)`, `logout()`, session role queries, BCrypt password hashing & verification. |
+| `UserService` | Service | `com.smartparking.service` | Non-auth profile operations: `getUserById`, `updateProfile`, `updateVehicleNumber`, `getAllUsers`, `getUsersByRole`. |
+| `ServiceException` | Unchecked Exception | `com.smartparking.service` | Base business exception wrapping internal persistence or runtime faults. |
+| `ValidationException` | Unchecked Exception | `com.smartparking.service` | Specific validation failure exception (format, length, duplicate email). |
+| `AuthenticationException` | Unchecked Exception | `com.smartparking.service` | Secure credential verification failure exception (prevents account enumeration). |
+
+### 10.3 Business Validation & Normalization Rules
+
+- **Full Name**: Required, trimmed, 2 to 100 characters. Supports letters (including international Unicode `\p{L}`), spaces, hyphens, periods, and apostrophes.
+- **Email**: Required, trimmed, converted to lowercase before lookup or persistence, maximum 120 characters. Validated against standard email format (`user@domain.tld`) with whitespace rejected.
+- **Duplicate Prevention**: Rejects duplicate email registrations case-insensitively before attempting database persistence.
+- **Phone Number**: Required, trimmed, 10 to 15 digits with optional leading `+` symbol (max 20 characters total).
+- **Password**: Required, 8 to 72 characters inclusive. Spaces are preserved without trimming or case conversion. Encrypted using `jBCrypt` with randomly generated salt (`BCrypt.gensalt()`).
+- **Vehicle Number**: Optional. Trimmed; stored as `null` if empty. Maximum 30 characters; allows alphanumeric characters, spaces, and hyphens.
+- **Role Enforcement**: Public registration strictly assigns `Role.CUSTOMER`. Admin role can never be self-assigned.
+
+### 10.4 Offline Unit Testing
+
+The authentication service includes comprehensive JUnit 5 tests using an in-memory `FakeUserDao`:
+
+```bash
+mvn clean test
+```
+
+Runs:
+- `AuthServiceTest`: Tests 14 scenarios including successful registration normalization, BCrypt verification, duplicate email rejection, boundary validations (name, email, phone, password, vehicle), invalid login handling, session synchronization, and logout.
+- `ModelAndConfigTest`: Tests Phase 1 entities, enums, and `AppSession`.
+- `JdbcUtilsTest`: Tests Phase 2 conversion utilities and enum parsers.
+- `DaoStructureTest`: Tests Phase 2 DAO reflection interfaces and signatures.
+
+---
+
+## 11. Upcoming Development Roadmap
+
+- **Phase 4 — JavaFX Authentication UI**:
+  - `Login.fxml` and `Register.fxml` views following modern Geometric Balance styling.
+  - `LoginController` and `RegisterController` integrating `AuthService`.
+  - Role-based dashboard navigation (Customer dashboard vs. Admin dashboard).
+- **Phase 5 — Slot Management & Real-Time Booking**:
   - `ReservationService` with atomic multi-step booking transactions (`FOR UPDATE`).
   - Floor-level visual bay selector with live occupancy color-coding.
   - Time-slot locking and conflict prevention.
-- **Phase 5 — Google Maps & Spatial Discovery**:
+- **Phase 6 — Google Maps & Spatial Discovery**:
   - JavaFX WebView Leaflet/Google Maps Platform bridge.
   - Interactive map pins showing capacity, rates, and distance.
-- **Phase 6 — ZXing QR Code Gate Simulator & Automated Billing**:
+- **Phase 7 — ZXing QR Code Gate Simulator & Automated Billing**:
   - Dynamic QR code generation for confirmed reservations.
   - Gate check-in and check-out scanning with duration billing and simulated receipts.
-- **Phase 7 — Analytics Dashboard & Reporting**:
+- **Phase 8 — Analytics Dashboard & Reporting**:
   - Occupancy rate charts, peak hour graphs, and revenue CSV exports.
