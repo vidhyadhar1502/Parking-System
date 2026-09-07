@@ -1,0 +1,17 @@
+# =============================================================================
+# Smart Parking Management System - Database Configuration Template
+# Copy this file to 'db.properties' or set the corresponding environment variables.
+# =============================================================================
+
+db.host=localhost
+db.port=3306
+db.name=smart_parking
+db.user=root
+db.password=your_secure_password_here
+
+# HikariCP Connection Pool Settings
+hikaricp.maximumPoolSize=10
+hikaricp.minimumIdle=2
+hikaricp.idleTimeout=30000
+hikaricp.connectionTimeout=20000
+hikaricp.maxLifetime=1800000

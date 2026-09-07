@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="700.0" prefWidth="1050.0" 
+            stylesheets="@../css/style.css" 
+            xmlns="http://javafx.com/javafx/21" 
+            xmlns:fx="http://javafx.com/fxml/1">
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="16.0" style="-fx-background-color: #0F172A; -fx-padding: 16px 24px;">
+            <VBox spacing="2.0">
+                <Label text="SMART PARKING MANAGEMENT SYSTEM" textFill="#FFFFFF" style="-fx-font-weight: 900; -fx-font-size: 16px; -fx-letter-spacing: 1px;" />
+                <Label text="JavaFX 21 + MySQL 8.x Enterprise Architecture • Phase 1 Foundation" textFill="#94A3B8" style="-fx-font-size: 11px;" />
+            </VBox>
+            <Region HBox.hgrow="ALWAYS" />
+            <Label styleClass="badge-available" text="SYSTEM ONLINE" />
+        </HBox>
+    </top>
+    <center>
+        <VBox alignment="CENTER" spacing="20.0" style="-fx-padding: 40px;">
+            <VBox alignment="CENTER" maxWidth="650.0" spacing="16.0" styleClass="card">
+                <Label styleClass="heading-title" text="Phase 1: Project Setup &amp; Database Foundations" textAlignment="CENTER" />
+                <Label styleClass="subheading" text="The core Java 17/21 Maven structure, HikariCP database pool, and MySQL relational schema have been successfully configured." textAlignment="CENTER" wrapText="true" />
+                
+                <VBox spacing="8.0" style="-fx-background-color: #F1F5F9; -fx-background-radius: 12px; -fx-padding: 16px; -fx-border-color: #E2E8F0; -fx-border-radius: 12px;">
+                    <Label text="Database Target: smart_parking (MySQL 8.x InnoDB)" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #0F172A;" />
+                    <Label text="• Models: User, ParkingLocation, ParkingSlot, Reservation, Payment" style="-fx-font-size: 12px; -fx-text-fill: #475569;" />
+                    <Label text="• Enums: Role, SlotType, SlotStatus, ReservationStatus, PaymentStatus, PaymentMethod" style="-fx-font-size: 12px; -fx-text-fill: #475569;" />
+                    <Label text="• Connection Pool: HikariCP 5.1.0 with SSL offload &amp; Statement Cache" style="-fx-font-size: 12px; -fx-text-fill: #475569;" />
+                </VBox>
+            </VBox>
+        </VBox>
+    </center>
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-background-color: #FFFFFF; -fx-border-color: #E2E8F0; -fx-border-width: 1px 0 0 0; -fx-padding: 12px 24px;">
+            <Label text="Smart Parking System © 2026 • College of Engineering Guindy / Campus Tech Hub" style="-fx-font-size: 11px; -fx-text-fill: #94A3B8;" />
+        </HBox>
+    </bottom>
+</BorderPane>

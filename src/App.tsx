@@ -313,6 +313,19 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Prototype Isolation Notice Banner */}
+        <div className="bg-[#0F172A] border-b border-[#334155] px-4 py-1.5 flex items-center justify-between text-[11px] text-[#94A3B8] select-none">
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono font-bold text-[10px]">
+              PROTOTYPE NOTICE
+            </span>
+            <span>
+              This React view serves strictly as a <strong>UI/functional prototype</strong>. Production application runs on <strong>Java 17/21 • JavaFX 21 • MySQL 8.x • JDBC • HikariCP</strong> in <code className="text-[#38BDF8]">src/main/java</code> and <code className="text-[#38BDF8]">database/</code>.
+            </span>
+          </div>
+          <span className="hidden md:inline text-[10px] text-[#64748B]">Phase 1: Setup &amp; DB Foundations Active</span>
+        </div>
+
         {/* Header */}
         <Header
           title={headerMeta.title}
