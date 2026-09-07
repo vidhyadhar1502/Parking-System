@@ -224,8 +224,9 @@ The compiled JAR will be output to `target/smart-parking-system-1.0.0-SNAPSHOT.j
 
 ---
 
-## 8. Current Implementation Status (Phase 1)
+## 8. Current Implementation Status
 
+### Phase 1 — Project Setup & Database Foundations (Complete)
 - [x] **Maven JavaFX 21 Project Setup**: Clean POM with JavaFX, MySQL Connector, HikariCP, ZXing, jBCrypt, SLF4J, and JUnit 5.
 - [x] **Database Schema (`database/schema.sql`)**: 5 relational tables with foreign keys, cascading rules, and performance indexes.
 - [x] **Realistic Seed Data (`database/seed.sql`)**: 3 facilities in Chennai, 28 multi-floor slots across 4 types, sample reservations, payments, and BCrypt-hashed credentials.
@@ -233,27 +234,102 @@ The compiled JAR will be output to `target/smart-parking-system-1.0.0-SNAPSHOT.j
 - [x] **Connection Pool (`DatabaseConfig.java`)**: Thread-safe HikariCP initialization with automatic environment variable fallbacks.
 - [x] **Session State Manager (`AppSession.java`)**: Thread-safe user session singleton.
 - [x] **JavaFX Entry Point & FXML (`MainApp.java`, `main.fxml`, `style.css`)**: Bootstrap stage and styling.
-- [x] **Unit Testing (`ModelAndConfigTest.java`)**: Automated POJO and session test suite.
 - [x] **Prototype Separation**: Clear disclaimer banner added to the React UI prototype.
+
+### Phase 2 — Data Access Object (DAO) Layer (Complete)
+- [x] **DAO Abstraction Layer**: 5 interfaces (`UserDao`, `ParkingLocationDao`, `ParkingSlotDao`, `ReservationDao`, `PaymentDao`).
+- [x] **Concrete JDBC Implementations**: HikariCP-backed DAOs (`JdbcUserDao`, `JdbcParkingLocationDao`, `JdbcParkingSlotDao`, `JdbcReservationDao`, `JdbcPaymentDao`).
+- [x] **Exception Encapsulation**: `DaoException` wraps checked `SQLException` instances to prevent database internals from leaking into business or presentation layers.
+- [x] **Transaction Orchestration**: `JdbcUtils.executeTransaction` pattern and `ParkingSlotDao.findByIdForUpdate(Connection, int)` for concurrent booking atomicity.
+- [x] **Safe Conversions & Precision**: `JdbcUtils` with null-safe Enum parsing, `java.time.LocalDateTime` to `java.sql.Timestamp` mapping, and `BigDecimal` precision for all financial columns.
+- [x] **Offline Unit Test Suite**: `JdbcUtilsTest` and `DaoStructureTest` verifying contracts, enum mapping, and reflection signatures.
 
 ---
 
-## 9. Upcoming Development Roadmap
+## 9. Phase 2 — DAO Layer Architecture & Documentation
 
-- **Phase 2 — Authentication & User Module**:
-  - `UserDAO` implementation (JDBC queries with `PreparedStatements`).
+### 9.1 DAO Layer Architecture
+
+The persistence tier decouples higher-level domain services from relational SQL syntax:
+
+```
+Service Layer (AuthService, ReservationService, BillingService)
+                     │
+                     ▼
+         DAO Interfaces (UserDao, etc.)
+                     │
+                     ▼
+  JDBC Implementations (JdbcUserDao, etc.)
+         │                        │
+         ▼                        ▼
+DatabaseConfig / HikariCP     JdbcUtils (Conversions & Tx)
+         │
+         ▼
+     MySQL 8.x (smart_parking database)
+```
+
+### 9.2 DAO Interfaces and Implementations
+
+| Interface | Implementation | Target Table | Primary Responsibilities |
+| :--- | :--- | :--- | :--- |
+| `UserDao` | `JdbcUserDao` | `users` | CRUD, `findByEmail`, `existsByEmail`, role filtering. *(Passwords handled as raw hashes without business hashing in DAO).* |
+| `ParkingLocationDao` | `JdbcParkingLocationDao` | `parking_locations` | CRUD, `findActive`, geo-coordinates (`latitude`/`longitude`), hourly tariffs. |
+| `ParkingSlotDao` | `JdbcParkingSlotDao` | `parking_slots` | CRUD, `findByLocationId`, `findByFloor`, status counters, `updateStatus`, and row-locking via `findByIdForUpdate(Connection, int)`. |
+| `ReservationDao` | `JdbcReservationDao` | `reservations` | CRUD, `findByCode`, `findActiveByUserId`, user/slot history, status updates, nullable timestamp mapping. |
+| `PaymentDao` | `JdbcPaymentDao` | `payments` | CRUD, `findByReservationId`, `findByStatus`, `BigDecimal` financial precision (`duration_hours`, `total_amount`). |
+
+### 9.3 SQL Quality & Security
+- **PreparedStatements**: 100% parameter parameterized queries (`?`). User input is never concatenated into SQL strings.
+- **Explicit Projection**: No `SELECT *` statements. Every query explicitly names columns matching `database/schema.sql`.
+- **Resource Management**: Strict `try-with-resources` blocks ensure all `Connection`, `PreparedStatement`, and `ResultSet` handles close promptly back into the HikariCP pool.
+- **Key Generation**: Primary keys generated via `Statement.RETURN_GENERATED_KEYS` are automatically mapped back to entity IDs upon `save()`.
+
+### 9.4 Transaction Ownership & Atomicity
+Multi-step business transactions (e.g. locking a slot, verifying status, creating a reservation, and updating slot status) are owned by the **Service Layer** in Phase 3.
+- `JdbcUtils.executeTransaction(TransactionCallback<T>)` manages `setAutoCommit(false)`, `commit()`, and `rollback()`.
+- `ParkingSlotDao.findByIdForUpdate(Connection connection, int slotId)` accepts the active transactional connection to issue `SELECT ... FOR UPDATE` without opening a secondary connection.
+
+### 9.5 How to Test the DAO Layer
+
+1. **Offline Unit & Structural Tests (No MySQL Required)**:
+   ```bash
+   mvn clean test
+   ```
+   Runs `ModelAndConfigTest`, `JdbcUtilsTest`, and `DaoStructureTest`. Verifies mapping logic, null-safe conversions, enum fallbacks, interface compliance, and reflection signatures without needing an active MySQL instance.
+
+2. **Integration Tests (Requires Live MySQL 8.x Instance)**:
+   Ensure your local MySQL service is active and seeded with `database/schema.sql` and `database/seed.sql`:
+   ```bash
+   # Configure environment credentials
+   export DB_HOST="localhost"
+   export DB_PORT="3306"
+   export DB_NAME="smart_parking"
+   export DB_USER="root"
+   export DB_PASSWORD="your_mysql_password"
+
+   # Run tests or launch JavaFX application
+   mvn test
+   mvn javafx:run
+   ```
+
+---
+
+## 10. Upcoming Development Roadmap
+
+- **Phase 3 — Authentication & User Security**:
   - `AuthService` with BCrypt password hashing & validation.
-  - Login & Registration FXML screens and controllers.
-  - Role-based navigation routing (Customer vs. Admin).
-- **Phase 3 — Slot Management & Real-Time Booking**:
-  - `ParkingSlotDAO`, `LocationDAO`, and `ReservationDAO`.
+  - User registration validation and duplicate email checks.
+  - Login & Registration JavaFX screens (`Login.fxml`, `Register.fxml`, controllers).
+  - Role-based navigation routing (Customer vs. Admin) via `AppSession`.
+- **Phase 4 — Slot Management & Real-Time Booking**:
+  - `ReservationService` with atomic multi-step booking transactions (`FOR UPDATE`).
   - Floor-level visual bay selector with live occupancy color-coding.
-  - Slot reservation workflow with time-slot locking and conflict prevention.
-- **Phase 4 — Google Maps & Spatial Discovery**:
+  - Time-slot locking and conflict prevention.
+- **Phase 5 — Google Maps & Spatial Discovery**:
   - JavaFX WebView Leaflet/Google Maps Platform bridge.
   - Interactive map pins showing capacity, rates, and distance.
-- **Phase 5 — ZXing QR Code Gate Simulator & Automated Billing**:
+- **Phase 6 — ZXing QR Code Gate Simulator & Automated Billing**:
   - Dynamic QR code generation for confirmed reservations.
   - Gate check-in and check-out scanning with duration billing and simulated receipts.
-- **Phase 6 — Analytics Dashboard & Reporting**:
+- **Phase 7 — Analytics Dashboard & Reporting**:
   - Occupancy rate charts, peak hour graphs, and revenue CSV exports.
