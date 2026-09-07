@@ -1,0 +1,6 @@
+{
+  "name": "Smart Parking Management System",
+  "description": "Desktop Smart Parking Management System with JavaFX, MySQL, JDBC, MVC, and Google Maps integration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
